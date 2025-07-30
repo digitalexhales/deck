@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>between breaths</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;500;600&family=Overpass:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Overpass', sans-serif;
+            background: #edebec;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.2) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 60% 20%, rgba(200,200,200,0.1) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px, 80px 80px;
+            min-height: 100vh;
+            color: #444249;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header h1 {
+            font-family: 'EB Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #444249;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #444249;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        
+        .tab-button {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #444249;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+        
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        
+        .tab-button.active {
+            background: #c9d5c4;
+            color: #444249;
+            box-shadow: 0 2px 6px rgba(201, 213, 196, 0.3);
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+        
+        .reflection {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #444249;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        .prompt {
+            font-size: 0.95rem;
+            color: #444249;
+            font-style: italic;
+            padding: 15px 20px;
+            background: rgba(185, 199, 221, 0.2);
+            border-radius: 10px;
+            border-left: 4px solid #b9c7dd;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .prompt:hover {
+            background: rgba(185, 199, 221, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .prompt::before {
+            content: "→ ";
+            color: #b9c7dd;
+            font-weight: 600;
+        }
+        
+        .prompt-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid rgba(185, 199, 221, 0.3);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            resize: vertical;
+            background: rgba(255, 255, 255, 0.9);
+            color: #444249;
+            margin-top: 10px;
+            transition: border-color 0.3s ease;
+            display: none;
+        }
+        
+        .prompt-textarea.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .prompt-textarea:focus {
+            outline: none;
+            border-color: #b9c7dd;
+            box-shadow: 0 0 0 3px rgba(185, 199, 221, 0.1);
+        }
+        
+        .prompt-textarea::placeholder {
+            color: #b9c7dd;
+            font-style: italic;
+        }
+        
+        .prompt.expanded {
+            background: rgba(185, 199, 221, 0.3);
+            border-left-color: #c9d5c4;
+        }
+        
+        .prompt.expanded::before {
+            content: "↓ ";
+            color: #c9d5c4;
+        }
+        
+        .journal-section {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .journal-textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid rgba(185, 199, 221, 0.3);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.8;
+            resize: vertical;
+            background: rgba(255, 255, 255, 0.8);
+            color: #444249;
+            transition: border-color 0.3s ease;
+        }
+        
+        .journal-textarea:focus {
+            outline: none;
+            border-color: #b9c7dd;
+            box-shadow: 0 0 0 3px rgba(185, 199, 221, 0.1);
+        }
+        
+        .journal-textarea::placeholder {
+            color: #b9c7dd;
+            font-style: italic;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-top: 40px;
+        }
+        
+        .footer h3 {
+            font-family: 'EB Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #444249;
+            margin-bottom: 15px;
+        }
+        
+        .footer p {
+            color: #444249;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+        
+        .social-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #c9d5c4;
+            color: #444249;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            transition: all 0.3s ease;
+        }
+        
+        .social-button:hover {
+            background: #b5c4b0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .social-button svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .floating-circle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .floating-circle:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+        
+        .floating-circle:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .section-tabs {
+                gap: 8px;
+            }
+            
+            .tab-button {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .floating-circle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="container">
+        <div class="header">
+            <h1>between breaths</h1>
+            <p>this isn't a guide. it's a gentle invitation.<br>
+            inside, you'll find 40 quiet reflections<br>
+            each one a moment to pause, reconnect, and return to yourself. <br>
+            they're not here to fix you. they're here to meet you.<br>
+            take what you need. leave the rest. begin wherever your breath lands.</p>
+        </div>
+
+        <div class="section-tabs">
+            <button class="tab-button active" onclick="showSection('permission')">permissions</button>
+            <button class="tab-button" onclick="showSection('truths')">truths</button>
+            <button class="tab-button" onclick="showSection('seasonal')">seasons</button>
+            <button class="tab-button" onclick="showSection('between')">the middle</button>
+            <button class="tab-button" onclick="showSection('journal')">freewrite</button>
+        </div>
+
+        <div id="permission" class="section active">
+            <div class="card">
+                <div class="reflection">it's okay if today feels heavier than yesterday</div>
+                <div class="prompt">what are you still holding onto?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you're allowed to feel deeply, even if no one else understands</div>
+                <div class="prompt">where does your tenderness want to speak?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">being sensitive isn't a flaw, it's a doorway</div>
+                <div class="prompt">what has your sensitivity taught you?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">your overwhelm deserves compassion, not correction</div>
+                <div class="prompt">what does your nervous system need more of right now?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you don't need to justify your emotions to be valid</div>
+                <div class="prompt">what would you feel if you stopped apologizing for it?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you can take up space, even when you're unsure</div>
+                <div class="prompt">what part of you needs room to breathe?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you're not too much, the world just moves too fast</div>
+                <div class="prompt">what pace feels most like you?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">it's okay to pause without earning it</div>
+                <div class="prompt">what would rest look like if it didn't require permission?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">your emotions are messengers, not mistakes</div>
+                <div class="prompt">what are they gently pointing you toward today?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you're allowed to be honest about your limits</div>
+                <div class="prompt">where are you needing to draw a softer boundary?</div>
+            </div>
+        </div>
+
+        <div id="truths" class="section">
+            <div class="card">
+                <div class="reflection">healing isn't always loud, sometimes it's a whisper</div>
+                <div class="prompt">what quiet truth is rising for you lately?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">worth doesn't live in what you do, it lives in who you are</div>
+                <div class="prompt">how would you move if you believed that?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">growth doesn't need to look impressive to be real</div>
+                <div class="prompt">what's shifting for you beneath the surface?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">your softness is a strength, not something to overcome</div>
+                <div class="prompt">where are you learning to soften, not harden?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">clarity comes in layers, not lightning bolts</div>
+                <div class="prompt">what's becoming clearer with time?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">letting go doesn't mean you failed, it means you listened</div>
+                <div class="prompt">what have you outgrown quietly?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">not all answers arrive with certainty</div>
+                <div class="prompt">where are you learning to trust without knowing?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">change is sacred, even when it's silent</div>
+                <div class="prompt">what's evolving in you that no one can see?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">it's brave to stay kind in a world that rushes</div>
+                <div class="prompt">how do you practice gentleness toward yourself?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you don't have to have it all figured out to be enough</div>
+                <div class="prompt">what would you tell your past self from here?</div>
+            </div>
+        </div>
+
+        <div id="seasonal" class="section">
+            <div class="card">
+                <div class="reflection">some seasons are for sprouting, others for stillness</div>
+                <div class="prompt">what season are you in, emotionally?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">your energy doesn't have to match the sunlight</div>
+                <div class="prompt">what is your inner weather asking for today?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">not all growth is visible, some of it roots quietly</div>
+                <div class="prompt">where is your growth hiding beneath the surface?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">just because it's bright outside doesn't mean you feel that way</div>
+                <div class="prompt">what does your body need when the light feels loud?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">transition is a form of transformation</div>
+                <div class="prompt">how do you know when it's time to shift?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">even the bare branches are becoming</div>
+                <div class="prompt">what are you shedding lately?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">slowing down is not the same as falling behind</div>
+                <div class="prompt">how can you honor your current pace?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you can bloom in softness, not just in struggle</div>
+                <div class="prompt">what would blooming gently look like for you?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">your cycles deserve reverence, not resistance</div>
+                <div class="prompt">what patterns are repeating for your attention?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">rest is a rite of nature, not a luxury</div>
+                <div class="prompt">where could you allow more seasonal rest?</div>
+            </div>
+        </div>
+
+        <div id="between" class="section">
+            <div class="card">
+                <div class="reflection">you don't have to be healed to be whole</div>
+                <div class="prompt">where are you learning to hold both?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">the middle isn't failure, it's becoming</div>
+                <div class="prompt">what are you learning here, in the middle?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">even in pause, you are progressing</div>
+                <div class="prompt">what growth is happening in your quiet moments?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">not knowing can be a kind of knowing</div>
+                <div class="prompt">what truth is softly emerging through the fog?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">you are allowed to linger in the unknown</div>
+                <div class="prompt">what have you been rushing yourself through?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">clarity often comes after surrender</div>
+                <div class="prompt">what are you ready to stop trying to figure out?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">softness is still movement</div>
+                <div class="prompt">where are you healing slowly?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">your timeline isn't too late</div>
+                <div class="prompt">what's arriving right on time, even if it feels slow?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">some questions aren't meant to be answered right away</div>
+                <div class="prompt">what's the question you keep returning to?</div>
+            </div>
+            <div class="card">
+                <div class="reflection">in being here, you're already finding your way</div>
+                <div class="prompt">what part of you feels seen in this moment?</div>
+            </div>
+        </div>
+
+        <div id="journal" class="section">
+            <div class="journal-section">
+                <h3 style="margin-bottom: 20px; color: #444249; font-weight: 400; font-family: 'EB Garamond', serif;">freewrite space</h3>
+                <p style="margin-bottom: 20px; color: #444249; font-size: 0.95rem;">use the space below for anything that needs a voice today.</p>
+                <textarea 
+                    class="journal-textarea" 
+                    placeholder="let your thoughts flow freely here..."
+                    id="journalText"
+                ></textarea>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>soft return</h3>
+            <p>come back to these reflections whenever you need a moment of quiet.<br> there is no right way to use this, only the way that feels most gentle for you.<br>if you'd like to share or save your favorite cards, tag @digitalexhales<br> or pass them along to someone who needs a pause.</p>
+            <a href="https://instagram.com/digitalexhales" target="_blank" class="social-button">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                @digitalexhales
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Global storage object to avoid localStorage issues
+        let promptResponses = {};
+
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function togglePromptTextarea(promptElement) {
+            const card = promptElement.parentElement;
+            let textarea = card.querySelector('.prompt-textarea');
+            
+            if (!textarea) {
+                // Create textarea if it doesn't exist
+                textarea = document.createElement('textarea');
+                textarea.className = 'prompt-textarea';
+                textarea.placeholder = 'your thoughts here...';
+                
+                // Create unique ID based on the prompt text
+                const promptText = promptElement.textContent.replace('→ ', '').trim();
+                const textareaId = 'prompt_' + promptText.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+                textarea.id = textareaId;
+                
+                // Load saved content if any
+                if (promptResponses[textareaId]) {
+                    textarea.value = promptResponses[textareaId];
+                }
+                
+                // Save content as user types
+                textarea.addEventListener('input', function() {
+                    promptResponses[textareaId] = this.value;
+                });
+                
+                card.appendChild(textarea);
+            }
+            
+            // Toggle textarea visibility
+            if (textarea.classList.contains('show')) {
+                textarea.classList.remove('show');
+                promptElement.classList.remove('expanded');
+            } else {
+                textarea.classList.add('show');
+                promptElement.classList.add('expanded');
+                // Focus the textarea after animation
+                setTimeout(() => textarea.focus(), 150);
+            }
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            // Add click handlers to all prompts
+            const prompts = document.querySelectorAll('.prompt');
+            prompts.forEach(prompt => {
+                prompt.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    togglePromptTextarea(this);
+                });
+            });
+
+            // Handle journal textarea (using in-memory storage)
+            const journalTextarea = document.getElementById('journalText');
+            if (journalTextarea) {
+                journalTextarea.addEventListener('input', function() {
+                    // Store in memory instead of localStorage
+                    promptResponses['freewrite'] = this.value;
+                });
+            }
+
+            // Add gentle animations on scroll
+            const cards = document.querySelectorAll('.card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
